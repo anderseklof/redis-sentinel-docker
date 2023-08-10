@@ -1,0 +1,102 @@
+version: "3"
+
+networks:
+  redisnet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.55.0/24
+          gateway: 192.168.55.1
+
+services:
+  redis1:
+    container_name: "redis1"
+    image: redis-ubuntu
+    ports:
+      - "6379:6379"
+    command: /opt/redis-stack/bin/redis-server /etc/config/redis1.conf
+    volumes:
+      - "./config:/etc/config"
+      - "./data/redis1:/var/lib/redis"
+    networks:
+      redisnet:
+        ipv4_address: 192.168.55.10
+
+  redis2:
+    container_name: "redis2"
+    image: redis-ubuntu
+    ports:
+      - "6380:6379"
+    command: /opt/redis-stack/bin/redis-server /etc/config/redis2.conf --slaveof redis1 6379
+    volumes:
+      - "./config:/etc/config"
+      - "./data/redis2:/var/lib/redis"
+    depends_on:
+      - redis1
+    networks:
+      redisnet:
+        ipv4_address: 192.168.55.11
+
+  redis3:
+    container_name: "redis3"
+    image: redis-ubuntu
+    ports:
+      - "6381:6379"
+    command: /opt/redis-stack/bin/redis-server /etc/config/redis3.conf --slaveof redis1 6379
+    volumes:
+      - "./config:/etc/config"
+      - "./data/redis3:/var/lib/redis"
+    depends_on:
+      - redis1
+    networks:
+      redisnet:
+        ipv4_address: 192.168.55.12
+
+  sentinel1:
+    container_name: "sentinel1"
+    image: redis-ubuntu
+    ports:
+      - "26379:26379"
+    command: /opt/redis-stack/bin/redis-server /etc/config/sentinel1.conf --sentinel
+    volumes:
+      - "./config:/etc/config"
+    depends_on:
+      - redis1
+      - redis2
+      - redis3
+    networks:
+      redisnet:
+        ipv4_address: 192.168.55.20
+
+  sentinel2:
+    container_name: "sentinel2"
+    image: redis-ubuntu
+    ports:
+      - "26380:26379"
+    command: /opt/redis-stack/bin/redis-server /etc/config/sentinel2.conf --sentinel
+    volumes:
+      - "./config:/etc/config"
+    depends_on:
+      - redis1
+      - redis2
+      - redis3
+    networks:
+      redisnet:
+        ipv4_address: 192.168.55.21
+
+  sentinel3:
+    container_name: "sentinel3"
+    image: redis-ubuntu
+    ports:
+      - "26381:26379"
+    command: /opt/redis-stack/bin/redis-server /etc/config/sentinel3.conf --sentinel
+    volumes:
+      - "./config:/etc/config"
+    depends_on:
+      - redis1
+      - redis2
+      - redis3
+    networks:
+      redisnet:
+        ipv4_address: 192.168.55.22
