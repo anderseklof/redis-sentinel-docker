@@ -16,7 +16,7 @@ Build: `docker build --no-cache --progress=plain -t redis-ubuntu .`. `--no-cache
 - 1 master, 2 slaves, 3 Sentinels.
 - Static IP addresses and not hostnames. Clients outside of Docker network can't use hostnames.
 - Set unique ports to allow back channel communication.
-- Create a network that is `attachable` so it can be used from other containers.
+- Create a network that is `attachable` so it can be used from other containers. In the other containers add the following:
   - Add top-level networks to find network:
     ```yaml
     networks:
