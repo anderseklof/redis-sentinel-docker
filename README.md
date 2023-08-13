@@ -1,14 +1,17 @@
 # Redis Sentinel Docker
 
-Repository for running Redis in Sentinel mode locally through Docker.
+Repository for running Redis in Sentinel mode locally in Docker.
 
 ## Docker image
 
 - Ubuntu 22.04 LTS.
-- Redis is based on `redis-stack-server`.
+- Redis based on `redis-stack-server`.
 - `RediSearch` and `RedisJSON` modules are activated.
 
-Build: `docker build --no-cache --progress=plain -t redis-ubuntu .`. `--no-cache` forces rebuild. `--progress-plain` logs output as `stdout`.
+Build: `docker build --no-cache --progress=plain -t redis-ubuntu .`
+
+- `--no-cache` forces rebuild.
+- `--progress-plain` logs output as `stdout`.
 
 ## Redis Sentinel
 
@@ -17,13 +20,13 @@ Build: `docker build --no-cache --progress=plain -t redis-ubuntu .`. `--no-cache
 - Static IP addresses and not hostnames. Clients outside of Docker network can't use hostnames.
 - Set unique ports to allow back channel communication.
 - Create a network that is `attachable` so it can be used from other containers. In the other containers add the following:
-  - Add top-level networks to find network:
+  - Add top-level `networks` to find network:
     ```yaml
     networks:
       redisnet:
         name: redisnet
     ```
-  - Add an service level IP-address for the container:
+  - Add service level `networks` to set the IP-address for the container:
     ```yaml
     networks:
       redisnet:
