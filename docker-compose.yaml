@@ -2,6 +2,8 @@ version: "3"
 
 networks:
   redisnet:
+    name: redisnet
+    attachable: true
     driver: bridge
     ipam:
       driver: default
