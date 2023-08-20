@@ -24,9 +24,9 @@ Docker commands:
   - An admin user (`admin`) with full permissions is created in all instances for administrative purposes.
   - Replication: All Redis instances communicate with each other with a user configured with `masteruser` and a password configured with `masterauth`. All Redis instances must have a user with the following permissions: `+psync +replconf +ping`.
   - HA with Sentinel: Communication to and from Sentinel has three main flows:
-    - Sentinel -> Redis (user: `sentinel_to_redis`): This communication is configured with `sentinel auth-user mymaster` and `sentinel auth-pass mymaster`. All Redis instances must have a user with the following permissions: `allchannels +multi +slaveof +ping +exec +subscribe +config|rewrite +role +publish +info +client|setname +client|kill +script|kill`.
-    - Sentinel -> Sentinel (user: `sentinel_to_sentinel`): This communication is configured with `sentinel sentinel-user` and `sentinel sentinel-pass`. All Sentinel instances must have a user with full permissions: `allchannels +@all`.
-    - Client -> Sentinel (user: `client_to_sentinel`): This communication is used between the client and Sentinel. All Sentinel instance must have a user with the following permissions: `-@all +auth +client|getname +client|id +client|setname +command +hello +ping +role +sentinel|get-master-addr-by-name +sentinel|master +sentinel|myid +sentinel|replicas +sentinel|sentinels`
+    - Sentinel -> Redis (user: `sentinelredis`): This communication is configured with `sentinel auth-user mymaster` and `sentinel auth-pass mymaster`. All Redis instances must have a user with the following permissions: `allchannels +multi +slaveof +ping +exec +subscribe +config|rewrite +role +publish +info +client|setname +client|kill +script|kill`.
+    - Sentinel -> Sentinel (user: `sentinelsentinel`): This communication is configured with `sentinel sentinel-user` and `sentinel sentinel-pass`. All Sentinel instances must have a user with full permissions: `allchannels +@all`.
+    - Client -> Sentinel (user: `clientsentinel`): This communication is used between the client and Sentinel. All Sentinel instance must have a user with the following permissions: `+auth +client|getname +client|id +client|setname +command +hello +ping +role +sentinel|get-master-addr-by-name +sentinel|master +sentinel|myid +sentinel|replicas +sentinel|sentinels`
 - Replication is enabled.
 - 1 master, 2 slaves, 3 Sentinels.
 - Static IP addresses and not hostnames.
@@ -43,7 +43,7 @@ Docker commands:
       redisnet:
         ipv4_address: 192.168.55.30
     ```
-- (Only available for Linux). To restore all configuration files to their original state, run `./script/create-conf-files.sh` script.
+- (Only available for Linux). To restore all configuration files to their original state, run `./script/create-conf-files.sh`.
 
 ## Failover
 
@@ -63,7 +63,7 @@ A failover will be triggered when the master instance is unreachable. The Sentin
   Caching the disconnected master state.
   Connecting to MASTER 192.168.55.11:6380
   MASTER <-> REPLICA sync started
-  REPLICAOF 192.168.55.11:6380 enabled (user request from 'id=13 addr=192.168.55.21:34886 laddr=192.168.55.12:6381 fd=10 name=sentinel-8f19c846-cmd age=89 idle=0 flags=x db=0 sub=0 psub=0 ssub=0 multi=4 qbuf=342 qbuf-free=20132 argv-mem=4 multi-mem=181 rbs=4096 rbp=4096 obl=45 oll=0 omem=0 tot-mem=25777 events=r cmd=exec user=sentinel_to_redis redir=-1 resp=2 lib-name= lib-ver=')
+  REPLICAOF 192.168.55.11:6380 enabled (user request from 'id=13 addr=192.168.55.21:34886 laddr=192.168.55.12:6381 fd=10 name=sentinel-8f19c846-cmd age=89 idle=0 flags=x db=0 sub=0 psub=0 ssub=0 multi=4 qbuf=342 qbuf-free=20132 argv-mem=4 multi-mem=181 rbs=4096 rbp=4096 obl=45 oll=0 omem=0 tot-mem=25777 events=r cmd=exec user=sentinelredis redir=-1 resp=2 lib-name= lib-ver=')
   CONFIG REWRITE executed with success.
   Non blocking connect for SYNC fired the event.
   Master replied to PING, replication can continue...
@@ -84,7 +84,7 @@ To add the paused instance to the fleet again, do the following:
   ```
   Connecting to MASTER 192.168.55.11:6380
   MASTER <-> REPLICA sync started
-  REPLICAOF 192.168.55.11:6380 enabled (user request from 'id=322 addr=192.168.55.21:42796 laddr=192.168.55.10:6379 fd=312 name=sentinel-8f19c846-cmd age=11 idle=0 flags=x db=0 sub=0 psub=0 ssub=0 multi=4 qbuf=201 qbuf-free=20273 argv-mem=4 multi-mem=181 rbs=1024 rbp=1024 obl=45 oll=0 omem=0 tot-mem=22705 events=r cmd=exec user=sentinel_to_redis redir=-1 resp=2 lib-name= lib-ver=')
+  REPLICAOF 192.168.55.11:6380 enabled (user request from 'id=322 addr=192.168.55.21:42796 laddr=192.168.55.10:6379 fd=312 name=sentinel-8f19c846-cmd age=11 idle=0 flags=x db=0 sub=0 psub=0 ssub=0 multi=4 qbuf=201 qbuf-free=20273 argv-mem=4 multi-mem=181 rbs=1024 rbp=1024 obl=45 oll=0 omem=0 tot-mem=22705 events=r cmd=exec user=sentinelredis redir=-1 resp=2 lib-name= lib-ver=')
   CONFIG REWRITE executed with success.
   Non blocking connect for SYNC fired the event.
   Master replied to PING, replication can continue...

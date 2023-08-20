@@ -42,7 +42,7 @@ for i in 1 2 3; do
 	echo "masterauth replicator123" | tee -a $redis_conf_file
 
 	echo "# Create user for Sentinel -> Redis communication" | tee -a $redis_conf_file
-	echo "user sentinel_to_redis on >sentinelredis123 allchannels +multi +slaveof +ping +exec +subscribe +config|rewrite +role +publish +info +client|setname +client|kill +script|kill" | tee -a $redis_conf_file
+	echo "user sentinelredis on >sentinelredis123 allchannels +multi +slaveof +ping +exec +subscribe +config|rewrite +role +publish +info +client|setname +client|kill +script|kill" | tee -a $redis_conf_file
 
 	echo "# Load modules RediSearch and RediJSON" | tee -a $redis_conf_file
 	echo "loadmodule /opt/redis-stack/lib/redisearch.so" | tee -a $redis_conf_file
@@ -71,16 +71,16 @@ for i in 1 2 3; do
 	echo "user admin on >admin123 ~* &* +@all" | tee -a $sentinel_conf_file
 
 	echo "# Create user for Client -> Sentinel communication" | tee -a $sentinel_conf_file
-	echo "user client_to_sentinel on >clientsentinel123 -@all +auth +client|getname +client|id +client|setname +command +hello +ping +role +sentinel|get-master-addr-by-name +sentinel|master +sentinel|myid +sentinel|replicas +sentinel|sentinels" | tee -a $sentinel_conf_file
+	echo "user clientsentinel on >clientsentinel123 -@all +auth +client|getname +client|id +client|setname +command +hello +ping +role +sentinel|get-master-addr-by-name +sentinel|master +sentinel|myid +sentinel|replicas +sentinel|sentinels" | tee -a $sentinel_conf_file
 
 	echo "# Create user for Sentinel -> Sentinel communication" | tee -a $sentinel_conf_file
-	echo "user sentinel_to_sentinel on >sentinelsentinel123 allchannels +@all" | tee -a $sentinel_conf_file
+	echo "user sentinelsentinel on >sentinelsentinel123 allchannels +@all" | tee -a $sentinel_conf_file
 
 	echo "# Set authentication for Sentinel -> Sentinel communication" | tee -a $sentinel_conf_file
-	echo "sentinel sentinel-user sentinel_to_sentinel" | tee -a $sentinel_conf_file
+	echo "sentinel sentinel-user sentinelsentinel" | tee -a $sentinel_conf_file
 	echo "sentinel sentinel-pass sentinelsentinel123" | tee -a $sentinel_conf_file
 
 	echo "# Set authentication for Sentinel -> Redis communication" | tee -a $sentinel_conf_file
-	echo "sentinel auth-user mymaster sentinel_to_redis" | tee -a $sentinel_conf_file
+	echo "sentinel auth-user mymaster sentinelredis" | tee -a $sentinel_conf_file
 	echo "sentinel auth-pass mymaster sentinelredis123" | tee -a $sentinel_conf_file
 done
