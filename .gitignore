@@ -1,2 +1,4 @@
-appendonly.aof
-dump.rdb
+appendonlydir
+*.aof
+*.rdb
+*.manifest
